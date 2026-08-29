@@ -6,8 +6,10 @@ let cached: Stripe | null = null;
 /** Instancia unica de Stripe (server-only). */
 export function getStripe(): Stripe {
   if (!cached) {
-    // Sin apiVersion explicita se usa la version fijada en la cuenta de Stripe.
-    cached = new Stripe(stripeSecretKey());
+    // Fijamos la version de la API en vez de heredar la de la cuenta: cuentas
+    // antiguas pueden tener fijada una version sin los campos que usamos
+    // (por ejemplo automatic_payment_methods al crear el PaymentIntent).
+    cached = new Stripe(stripeSecretKey(), { apiVersion: '2025-02-24.acacia' });
   }
   return cached;
 }
