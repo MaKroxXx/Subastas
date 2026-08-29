@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
+import DemoNotice from '@/components/DemoNotice';
 import LoginForm from '@/components/LoginForm';
 import { getSessionUser } from '@/lib/supabase/server';
 
@@ -16,8 +17,11 @@ export default async function LoginPage({ searchParams }: { searchParams: { next
       <h1 className="text-2xl font-bold text-gray-900">Entrar</h1>
       <p className="mt-1 text-sm text-neutral">Accede para publicar deals y contactar.</p>
 
-      <div className="card mt-6 p-6">
-        <LoginForm next={searchParams.next} />
+      <div className="mt-6 space-y-4">
+        <DemoNotice action="Iniciar sesion" />
+        <div className="card p-6">
+          <LoginForm next={searchParams.next} />
+        </div>
       </div>
 
       <p className="mt-4 text-center text-sm text-neutral">

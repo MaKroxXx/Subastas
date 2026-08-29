@@ -1,11 +1,14 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
-import { supabaseAnonKey, supabaseUrl } from '@/lib/env';
+import { isDemoMode, supabaseAnonKey, supabaseUrl } from '@/lib/env';
 
 const PROTECTED_PREFIXES = ['/dashboard'];
 
 /** Refresca la sesion en cada request y protege las rutas privadas. */
 export async function updateSession(request: NextRequest) {
+  // En modo demo no hay sesiones que refrescar ni rutas privadas que proteger.
+  if (isDemoMode()) return NextResponse.next({ request });
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(supabaseUrl(), supabaseAnonKey(), {

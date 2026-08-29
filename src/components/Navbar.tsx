@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import { Suspense } from 'react';
+import { isDemoMode } from '@/lib/env';
 import { createClient } from '@/lib/supabase/server';
 import SearchBar from '@/components/SearchBar';
 import UserMenu from '@/components/UserMenu';
@@ -6,13 +8,12 @@ import UserMenu from '@/components/UserMenu';
 export const dynamic = 'force-dynamic';
 
 export default async function Navbar() {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const demo = isDemoMode();
+  const supabase = demo ? null : createClient();
+  const user = supabase ? (await supabase.auth.getUser()).data.user : null;
 
   let name: string | null = null;
-  if (user) {
+  if (user && supabase) {
     const { data: profile } = await supabase
       .from('users')
       .select('name')
@@ -28,8 +29,15 @@ export default async function Navbar() {
           Deal<span className="text-primary">Startups</span>
         </Link>
 
+        {demo ? (
+          <span className="badge bg-amber-50 text-amber-700 ring-amber-200">Demo</span>
+        ) : null}
+
         <div className="hidden flex-1 sm:block">
-          <SearchBar />
+          {/* useSearchParams() exige un limite de Suspense en paginas estaticas. */}
+          <Suspense fallback={<div className="h-[38px] rounded-lg bg-gray-100" />}>
+            <SearchBar />
+          </Suspense>
         </div>
 
         <div className="ml-auto flex items-center gap-2">

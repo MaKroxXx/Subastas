@@ -5,7 +5,7 @@ import type { Metadata } from 'next';
 import ContactForm from '@/components/ContactForm';
 import CloseDealButton from '@/components/CloseDealButton';
 import { getPublicDeal, registerView } from '@/lib/deals';
-import { isStripeConfigured } from '@/lib/env';
+import { isDemoMode, isStripeConfigured } from '@/lib/env';
 import { applySuccessfulBid } from '@/lib/payments';
 import { getStripe } from '@/lib/stripe';
 import { createClient } from '@/lib/supabase/server';
@@ -50,10 +50,8 @@ async function reconcileRedirect(searchParams: Props['searchParams'], userId: st
 }
 
 export default async function DealDetailPage({ params, searchParams }: Props) {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const supabase = isDemoMode() ? null : createClient();
+  const user = supabase ? (await supabase.auth.getUser()).data.user : null;
 
   await reconcileRedirect(searchParams, user?.id ?? null);
 
@@ -63,9 +61,10 @@ export default async function DealDetailPage({ params, searchParams }: Props) {
   const isOwner = user?.id === deal.user_id;
   if (!isOwner) await registerView(deal.id);
 
-  const profile = user
-    ? await supabase.from('users').select('name,email').eq('id', user.id).maybeSingle()
-    : null;
+  const profile =
+    user && supabase
+      ? await supabase.from('users').select('name,email').eq('id', user.id).maybeSingle()
+      : null;
 
   const justPaid = searchParams.paid === '1' || searchParams.redirect_status === 'succeeded';
 

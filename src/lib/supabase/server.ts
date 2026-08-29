@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
-import { supabaseAnonKey, supabaseServiceKey, supabaseUrl } from '@/lib/env';
+import { isDemoMode, supabaseAnonKey, supabaseServiceKey, supabaseUrl } from '@/lib/env';
 
 /**
  * Cliente ligado a la sesion del usuario (cookies). Respeta RLS.
@@ -39,8 +39,10 @@ export function createAdminClient() {
   });
 }
 
-/** Devuelve el usuario autenticado o null. */
+/** Devuelve el usuario autenticado o null (siempre null en modo demo). */
 export async function getSessionUser() {
+  if (isDemoMode()) return null;
+
   const supabase = createClient();
   const {
     data: { user },

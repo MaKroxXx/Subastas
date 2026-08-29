@@ -1,4 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { demoGetDeal, demoListDeals, demoStats } from '@/lib/demo';
+import { isDemoMode } from '@/lib/env';
 import { createAdminClient, createClient } from '@/lib/supabase/server';
 import { sanitizeSearch } from '@/lib/validation';
 import type { DealType, PublicDeal } from '@/lib/types';
@@ -31,6 +33,8 @@ export async function listDeals(
   options: ListDealsOptions = {},
   client?: SupabaseClient,
 ): Promise<ListDealsResult> {
+  if (isDemoMode()) return demoListDeals(options);
+
   const { page = 1, perPage = 10, type, q, section = 'all' } = options;
   const supabase = client ?? createClient();
 
@@ -73,6 +77,8 @@ export async function listDeals(
 
 /** Deal publico por id (incluye los cerrados, que se muestran con badge). */
 export async function getPublicDeal(id: string, client?: SupabaseClient): Promise<PublicDeal | null> {
+  if (isDemoMode()) return demoGetDeal(id);
+
   const supabase = client ?? createClient();
   const { data, error } = await supabase
     .from('ranked_deals')
@@ -86,6 +92,8 @@ export async function getPublicDeal(id: string, client?: SupabaseClient): Promis
 
 /** Suma una visita sin bloquear el render si falla. */
 export async function registerView(id: string): Promise<void> {
+  if (isDemoMode()) return;
+
   try {
     const supabase = createAdminClient();
     await supabase.rpc('increment_deal_views', { p_deal_id: id });
@@ -100,6 +108,8 @@ export interface MarketplaceStats {
 }
 
 export async function getStats(): Promise<MarketplaceStats> {
+  if (isDemoMode()) return demoStats();
+
   try {
     const supabase = createAdminClient();
     const [deals, users] = await Promise.all([

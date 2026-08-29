@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import DealCard from '@/components/DealCard';
 import DealFilters from '@/components/DealFilters';
 import Pagination from '@/components/Pagination';
@@ -61,7 +62,9 @@ export default async function HomePage({ searchParams }: { searchParams: SearchP
               Ordenados por puja semanal. {featured.total} deals con puja activa.
             </p>
           </div>
-          <DealFilters />
+          <Suspense fallback={null}>
+            <DealFilters />
+          </Suspense>
         </div>
 
         {q ? (

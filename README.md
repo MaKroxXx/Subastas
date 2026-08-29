@@ -10,13 +10,28 @@ Auth + Storage) · Stripe · Vercel**.
 
 ---
 
-## Puesta en marcha
+## Ver la web en 2 minutos (modo demo)
+
+```bash
+npm install
+npm run dev     # http://localhost:3000
+```
+
+Sin ninguna variable de entorno, la web arranca en **modo demo**: portada con
+ranking, filtros, busqueda, paginacion y fichas de deal, todo con datos de
+ejemplo. Auth, publicacion y pagos quedan desactivados y se indica con un aviso.
+Es la forma rapida de ver la interfaz antes de dar de alta Supabase y Stripe.
+
+## Puesta en marcha completa
 
 ```bash
 npm install
 cp .env.example .env.local   # rellena las claves
 npm run dev                  # http://localhost:3000
 ```
+
+En cuanto `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` existen,
+el modo demo se apaga solo y la web pasa a leer y escribir en tu base de datos.
 
 ### 1. Supabase
 
